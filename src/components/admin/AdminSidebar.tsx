@@ -1,7 +1,10 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, ChevronRight, LayoutDashboard, LibraryBig, Loader2, LogOut, Menu, ShoppingCart, Tags, Users, UserRound, X, type LucideIcon } from 'lucide-react'
+import { Bot, BookOpen, ChevronRight, ChevronUp, CircleUserRound, CreditCard, LayoutDashboard, LibraryBig, Loader2, LockKeyhole, LogOut, Menu, ShoppingCart, Tags, Users, UserRound, X, type LucideIcon } from 'lucide-react'
 
 import { Button } from '../ui/button'
+import { fetchAdminProfile, type AdminProfile } from '../../lib/adminProfile'
+import { loadAuthSession } from '../../lib/auth'
 
 export type AdminSidebarItem = {
   label: string
@@ -24,6 +27,8 @@ type AdminSidebarProps = {
   isLoggingOut?: boolean
 }
 
+type SidebarAdminProfile = Pick<AdminProfile, 'avatarUrl' | 'email' | 'fullName' | 'role' | 'username'>
+
 const sidebarGroups: AdminSidebarGroup[] = [
   {
     title: 'Overview',
@@ -44,6 +49,13 @@ const sidebarGroups: AdminSidebarGroup[] = [
       { label: 'Customers', icon: Users, href: '/admin/dashboard/customers' },
     ],
   },
+  {
+    title: 'Tools',
+    items: [
+      { label: 'AI Assistance', icon: Bot, href: '/admin/dashboard/ai-assistance' },
+      { label: 'POS', icon: CreditCard, href: '/admin/dashboard/pos' },
+    ],
+  },
 ]
 
 export function AdminSidebar({
@@ -55,6 +67,92 @@ export function AdminSidebar({
   onLogout,
   isLoggingOut = false,
 }: AdminSidebarProps) {
+  const session = loadAuthSession()
+  const profileMenuRef = useRef<HTMLDivElement | null>(null)
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const [adminProfile, setAdminProfile] = useState<SidebarAdminProfile | null>(() =>
+    session?.user
+      ? {
+          avatarUrl: session.user.avatarUrl,
+          email: session.user.email,
+          fullName: session.user.fullName,
+          role: session.user.role,
+          username: session.user.username,
+        }
+      : null,
+  )
+
+  useEffect(() => {
+    let isActive = true
+
+    fetchAdminProfile()
+      .then((response) => {
+        if (isActive) {
+          setAdminProfile(response.data)
+        }
+      })
+      .catch(() => {
+        if (isActive && session?.user) {
+          setAdminProfile({
+            avatarUrl: session.user.avatarUrl,
+            email: session.user.email,
+            fullName: session.user.fullName,
+            role: session.user.role,
+            username: session.user.username,
+          })
+        }
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [session?.user])
+
+  useEffect(() => {
+    function handlePointerDown(event: PointerEvent) {
+      if (!profileMenuRef.current?.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false)
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsProfileMenuOpen(false)
+      }
+    }
+
+    if (!isProfileMenuOpen) {
+      return undefined
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleEscape)
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isProfileMenuOpen])
+
+  const adminInitials = useMemo(() => {
+    const name = adminProfile?.fullName?.trim() || adminProfile?.username?.trim() || 'A'
+    return name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('')
+  }, [adminProfile?.fullName, adminProfile?.username])
+
+  function closeProfileMenu() {
+    setIsProfileMenuOpen(false)
+  }
+
+  function handleLogoutClick() {
+    closeProfileMenu()
+    onLogout()
+  }
+
   return (
     <>
       {!isDesktopOpen ? (
@@ -81,7 +179,7 @@ export function AdminSidebar({
 
       <aside
         className={[
-          'fixed inset-y-0 left-0 z-50 w-72 border-r border-border/70 bg-background px-4 py-5 shadow-xl transition-transform duration-200',
+          'fixed inset-y-0 left-0 z-50 flex h-full w-72 flex-col border-r border-border/70 bg-background px-4 py-5 shadow-xl transition-transform duration-200',
           isOpen ? 'translate-x-0' : '-translate-x-full',
           isDesktopOpen ? 'lg:translate-x-0' : 'lg:-translate-x-full',
         ].join(' ')}
@@ -106,7 +204,7 @@ export function AdminSidebar({
           </Button>
         </div>
 
-        <nav className="mt-6 space-y-5">
+        <nav className="mt-6 min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
           {sidebarGroups.map((group) => (
             <div key={group.title}>
               <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">{group.title}</p>
@@ -136,11 +234,59 @@ export function AdminSidebar({
           ))}
         </nav>
 
-        <div className="mt-6 rounded-3xl border border-border/70 bg-muted/20 p-4">
-          <Button variant="outline" className="w-full justify-start" onClick={onLogout} disabled={isLoggingOut}>
-            {isLoggingOut ? <Loader2 className="mr-2 size-4 animate-spin" /> : <LogOut className="mr-2 size-4" />}
-            {isLoggingOut ? 'Logging out...' : 'Logout'}
-          </Button>
+        <div ref={profileMenuRef} className="relative mt-6 pb-1">
+          {isProfileMenuOpen ? (
+            <div className="absolute bottom-full left-0 right-0 z-20 mb-3 rounded-3xl border border-border/70 bg-background p-2 shadow-2xl shadow-black/10">
+              <div className="space-y-1">
+                <Button asChild variant="ghost" className="h-11 w-full justify-start gap-3 rounded-2xl px-3" onClick={closeProfileMenu}>
+                  <Link to="/admin/profile">
+                    <CircleUserRound className="size-4" />
+                    <span>Profile</span>
+                  </Link>
+                </Button>
+
+                <Button asChild variant="ghost" className="h-11 w-full justify-start gap-3 rounded-2xl px-3" onClick={closeProfileMenu}>
+                  <Link to="/admin/security">
+                    <LockKeyhole className="size-4" />
+                    <span>Security</span>
+                  </Link>
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  className="h-11 w-full justify-start gap-3 rounded-2xl px-3 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={handleLogoutClick}
+                  disabled={isLoggingOut}
+                >
+                  {isLoggingOut ? <Loader2 className="size-4 animate-spin" /> : <LogOut className="size-4" />}
+                  <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
+                </Button>
+              </div>
+            </div>
+          ) : null}
+
+          <button
+            type="button"
+            className="flex w-full items-center gap-3 rounded-3xl border border-border/70 bg-muted/20 p-3 text-left shadow-sm transition-colors hover:bg-muted/40"
+            onClick={() => setIsProfileMenuOpen((current) => !current)}
+            aria-expanded={isProfileMenuOpen}
+            aria-haspopup="menu"
+          >
+            <div className="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-slate-950 via-slate-800 to-slate-700 text-sm font-semibold text-white shadow-sm">
+              {adminProfile?.avatarUrl ? (
+                <img src={adminProfile.avatarUrl} alt={adminProfile.fullName} className="size-full object-cover" />
+              ) : (
+                <span>{adminInitials}</span>
+              )}
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold leading-5">{adminProfile?.fullName ?? 'Admin account'}</p>
+              <p className="truncate text-xs text-muted-foreground">{adminProfile?.email ?? session?.user.email ?? 'Signed in account'}</p>
+            </div>
+
+            <ChevronUp className={`size-4 shrink-0 text-muted-foreground transition-transform ${isProfileMenuOpen ? '' : 'rotate-180'}`} />
+          </button>
         </div>
       </aside>
     </>

@@ -4,11 +4,13 @@ export interface AdminUser {
   id: number
   username: string
   fullName: string
+  avatarUrl?: string
   email: string
   role: string
   emailVerified: boolean
   enabled: boolean
   createdAt: string
+  updatedAt?: string
 }
 
 export interface LoginRequest {
