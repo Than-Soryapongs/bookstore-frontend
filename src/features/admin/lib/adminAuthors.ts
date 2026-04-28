@@ -1,4 +1,4 @@
-import { authenticatedApiRequest } from '../features/shared/auth'
+import { authenticatedApiRequest } from '../../shared/auth'
 
 export interface Author {
   id: number

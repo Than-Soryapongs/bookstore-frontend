@@ -2,18 +2,18 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, ty
 import { Navigate } from 'react-router-dom'
 import { BookOpen, Check, ChevronDown, Edit3, FileSpreadsheet, FileText, Loader2, Menu, Plus, RefreshCcw, Search, ShieldCheck, Star, Trash2, Upload, X } from 'lucide-react'
 
-import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card'
-import { Input } from '../components/ui/input'
-import { Skeleton } from '../components/ui/skeleton'
-import AdminSidebar from '../components/admin/AdminSidebar'
+import { Alert, AlertDescription, AlertTitle } from '../../../components/ui/alert'
+import { Badge } from '../../../components/ui/badge'
+import { Button } from '../../../components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../../components/ui/card'
+import { Input } from '../../../components/ui/input'
+import { Skeleton } from '../../../components/ui/skeleton'
+import AdminSidebar from '../components/AdminSidebar'
 import { fetchAdminAuthors, type Author } from '../lib/adminAuthors'
 import { fetchAdminCategories, type Category } from '../lib/adminCategories'
-import { clearAuthSession, loadAuthSession, logoutAdmin } from '../lib/auth'
+import { clearAuthSession, loadAuthSession, logout } from '../../shared/auth'
 import { createAdminBook, deleteAdminBook, fetchAdminBook, fetchAdminBooks, patchAdminBookStatus, updateAdminBook, type Book } from '../lib/adminBooks'
-import { exportRowsToExcel, exportRowsToPdf, type ExportColumn } from '../lib/exportTable'
+import { exportRowsToExcel, exportRowsToPdf, type ExportColumn } from '../../shared/exportTable'
 
 const MAX_BOOK_COVER_BYTES = 5 * 1024 * 1024
 
@@ -176,7 +176,7 @@ export function AdminBooksPage() {
     setIsLoggingOut(true)
 
     try {
-      await logoutAdmin()
+      await logout()
       clearAuthSession()
     } finally {
       window.location.assign('/admin/login')
@@ -770,7 +770,6 @@ export function AdminBooksPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="outline" className="w-fit gap-2 self-start sm:self-center">
                   <BookOpen className="size-3.5" />
-                  Modern catalog UI
                 </Badge>
                 <Button type="button" onClick={openCreateModal} className="gap-2">
                   <Plus className="size-4" />

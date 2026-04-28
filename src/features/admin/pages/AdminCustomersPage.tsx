@@ -2,15 +2,15 @@ import { useCallback, useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, FileSpreadsheet, FileText, Loader2, Menu, RefreshCcw, Search, ShieldCheck, UserRound, X } from 'lucide-react'
 
-import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import AdminSidebar from '../components/admin/AdminSidebar'
-import { Input } from '../components/ui/input'
-import { clearAuthSession, loadAuthSession, logoutAdmin } from '../lib/auth'
+import { Alert, AlertDescription, AlertTitle } from '../../../components/ui/alert'
+import { Badge } from '../../../components/ui/badge'
+import { Button } from '../../../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card'
+import AdminSidebar from '../components/AdminSidebar'
+import { Input } from '../../../components/ui/input'
+import { loadAuthSession, logout } from '../../shared/auth'
 import { fetchAdminUser, fetchAdminUsers, patchAdminUserEnabled, type AdminUser } from '../lib/adminUsers'
-import { exportRowsToExcel, exportRowsToPdf, type ExportColumn } from '../lib/exportTable'
+import { exportRowsToExcel, exportRowsToPdf, type ExportColumn } from '../../shared/exportTable'
 
 type UserPageMeta = {
   totalElements: number
@@ -89,8 +89,7 @@ export function AdminCustomersPage() {
     setIsLoggingOut(true)
 
     try {
-      await logoutAdmin()
-      clearAuthSession()
+      await logout()
     } finally {
       window.location.assign('/admin/login')
     }

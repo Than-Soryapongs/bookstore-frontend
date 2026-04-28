@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Menu, ShieldCheck } from 'lucide-react'
 
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import AdminSidebar from '../components/admin/AdminSidebar'
-import { clearAuthSession, loadAuthSession, logoutAdmin } from '../lib/auth'
+import { Badge } from '../../../components/ui/badge'
+import { Button } from '../../../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card'
+import AdminSidebar from '../components/AdminSidebar'
+import { loadAuthSession, logout } from '../../shared/auth'
 
 export function AdminDashboardPage() {
   const session = loadAuthSession()
@@ -20,8 +20,7 @@ export function AdminDashboardPage() {
     setIsLoggingOut(true)
 
     try {
-      await logoutAdmin()
-      clearAuthSession()
+      await logout()
     } finally {
       window.location.assign('/admin/login')
     }

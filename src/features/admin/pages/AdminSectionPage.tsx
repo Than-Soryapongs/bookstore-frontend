@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { Bot, BookOpen, CreditCard, Menu, Package2, RefreshCcw, ShieldCheck, ShoppingCart, Users } from 'lucide-react'
 
-import AdminSidebar from '../components/admin/AdminSidebar'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card'
-import { clearAuthSession, loadAuthSession, logoutAdmin } from '../lib/auth'
+import AdminSidebar from '../components/AdminSidebar'
+import { Badge } from '../../../components/ui/badge'
+import { Button } from '../../../components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../../components/ui/card'
+import { loadAuthSession, logout } from '../../shared/auth'
 
 const sectionLabels: Record<string, { title: string; description: string }> = {
   authors: {
@@ -114,8 +114,7 @@ export function AdminSectionPage() {
     setIsLoggingOut(true)
 
     try {
-      await logoutAdmin()
-      clearAuthSession()
+      await logout()
     } finally {
       window.location.assign('/admin/login')
     }

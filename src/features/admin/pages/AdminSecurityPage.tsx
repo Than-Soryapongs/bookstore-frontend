@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { AlertTriangle, LockKeyhole, Menu, ShieldCheck, ShieldEllipsis, ShieldUser, UserRoundCheck } from 'lucide-react'
 
-import AdminSidebar from '../components/admin/AdminSidebar'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import { clearAuthSession, loadAuthSession, logoutAdmin } from '../lib/auth'
+import AdminSidebar from '../components/AdminSidebar'
+import { Alert, AlertDescription, AlertTitle } from '../../../components/ui/alert'
+import { Badge } from '../../../components/ui/badge'
+import { Button } from '../../../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card'
+import { Input } from '../../../components/ui/input'
+import { changePassword, loadAuthSession, logout, saveAuthSession } from '../../shared/auth'
 import { fetchAdminProfile, type AdminProfile as AdminMeProfile } from '../lib/adminProfile'
 
 function formatDate(value: string) {
@@ -24,11 +26,28 @@ function formatDate(value: string) {
 
 export function AdminSecurityPage() {
   const session = loadAuthSession()
+  const sessionAccessToken = session?.accessToken
+  const sessionAvatarUrl = session?.user.avatarUrl
+  const sessionCreatedAt = session?.user.createdAt
+  const sessionEmail = session?.user.email
+  const sessionEnabled = session?.user.enabled
+  const sessionEmailVerified = session?.user.emailVerified
+  const sessionFullName = session?.user.fullName
+  const sessionId = session?.user.id
+  const sessionRole = session?.user.role
+  const sessionUpdatedAt = session?.user.updatedAt
+  const sessionUsername = session?.user.username
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(() =>
     typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : true,
   )
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmNewPassword, setConfirmNewPassword] = useState('')
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
+  const [passwordMessage, setPasswordMessage] = useState<string | null>(null)
+  const [passwordError, setPasswordError] = useState<string | null>(null)
   const [profile, setProfile] = useState<AdminMeProfile | null>(null)
 
   useEffect(() => {
@@ -41,11 +60,18 @@ export function AdminSecurityPage() {
         }
       })
       .catch(() => {
-        if (isActive && session?.user) {
+        if (isActive && sessionAccessToken) {
           setProfile({
-            ...session.user,
-            avatarUrl: session.user.avatarUrl,
-            updatedAt: session.user.updatedAt ?? session.user.createdAt,
+            id: sessionId as number,
+            username: sessionUsername as string,
+            fullName: sessionFullName as string,
+            avatarUrl: sessionAvatarUrl,
+            email: sessionEmail as string,
+            role: sessionRole as string,
+            emailVerified: Boolean(sessionEmailVerified),
+            enabled: Boolean(sessionEnabled),
+            createdAt: sessionCreatedAt as string,
+            updatedAt: sessionUpdatedAt ?? (sessionCreatedAt as string),
           })
         }
       })
@@ -53,16 +79,59 @@ export function AdminSecurityPage() {
     return () => {
       isActive = false
     }
-  }, [session?.user])
+  }, [
+    sessionAccessToken,
+    sessionAvatarUrl,
+    sessionCreatedAt,
+    sessionEmail,
+    sessionEmailVerified,
+    sessionEnabled,
+    sessionFullName,
+    sessionId,
+    sessionRole,
+    sessionUpdatedAt,
+    sessionUsername,
+  ])
 
   async function handleLogout() {
     setIsLoggingOut(true)
 
     try {
-      await logoutAdmin()
-      clearAuthSession()
+      await logout()
     } finally {
       window.location.assign('/admin/login')
+    }
+  }
+
+  async function handleChangePassword(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setPasswordError(null)
+    setPasswordMessage(null)
+
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError('New passwords do not match.')
+      return
+    }
+
+    setIsChangingPassword(true)
+
+    try {
+      const response = await changePassword({
+        currentPassword,
+        newPassword,
+        confirmNewPassword,
+      })
+
+      saveAuthSession(response.data)
+      setPasswordMessage(response.message || 'Password updated successfully.')
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmNewPassword('')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to change password.'
+      setPasswordError(message)
+    } finally {
+      setIsChangingPassword(false)
     }
   }
 
@@ -196,6 +265,81 @@ export function AdminSecurityPage() {
                       <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">Created</p>
                       <p className="mt-2 text-base font-semibold">{formatDate(displayedProfile.createdAt)}</p>
                     </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-border/70 bg-card/80 shadow-sm">
+                  <CardHeader className="border-b bg-muted/20">
+                    <CardTitle>Change password</CardTitle>
+                    <CardDescription>Update the signed-in admin password with the current password.</CardDescription>
+                  </CardHeader>
+
+                  <CardContent className="space-y-4 pt-5">
+                    {passwordError ? (
+                      <Alert variant="destructive">
+                        <AlertTitle>Password change failed</AlertTitle>
+                        <AlertDescription>{passwordError}</AlertDescription>
+                      </Alert>
+                    ) : null}
+
+                    {passwordMessage ? (
+                      <Alert>
+                        <AlertTitle>Password updated</AlertTitle>
+                        <AlertDescription>{passwordMessage}</AlertDescription>
+                      </Alert>
+                    ) : null}
+
+                    <form className="space-y-4" onSubmit={handleChangePassword}>
+                      <div className="space-y-2">
+                        <label htmlFor="currentPassword" className="text-sm font-medium">
+                          Current password
+                        </label>
+                        <Input
+                          id="currentPassword"
+                          type="password"
+                          autoComplete="current-password"
+                          value={currentPassword}
+                          onChange={(event) => setCurrentPassword(event.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="newPassword" className="text-sm font-medium">
+                          New password
+                        </label>
+                        <Input
+                          id="newPassword"
+                          type="password"
+                          autoComplete="new-password"
+                          value={newPassword}
+                          onChange={(event) => setNewPassword(event.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label htmlFor="confirmNewPassword" className="text-sm font-medium">
+                          Confirm new password
+                        </label>
+                        <Input
+                          id="confirmNewPassword"
+                          type="password"
+                          autoComplete="new-password"
+                          value={confirmNewPassword}
+                          onChange={(event) => setConfirmNewPassword(event.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <Button
+                        type="submit"
+                        className="h-11 w-full"
+                        disabled={isChangingPassword || !currentPassword || !newPassword || !confirmNewPassword}
+                      >
+                        {isChangingPassword ? 'Updating password...' : 'Change password'}
+                      </Button>
+                    </form>
                   </CardContent>
                 </Card>
               </div>

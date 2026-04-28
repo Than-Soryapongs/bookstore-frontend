@@ -4,15 +4,15 @@ import { ChevronLeft, ChevronRight, FileSpreadsheet, FileText, Loader2, Menu, Re
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
-import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
-import AdminSidebar from '../components/admin/AdminSidebar'
-import { Input } from '../components/ui/input'
-import { clearAuthSession, loadAuthSession, logoutAdmin } from '../lib/auth'
+import { Alert, AlertDescription, AlertTitle } from '../../../components/ui/alert'
+import { Badge } from '../../../components/ui/badge'
+import { Button } from '../../../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card'
+import AdminSidebar from '../components/AdminSidebar'
+import { Input } from '../../../components/ui/input'
+import { loadAuthSession, logout } from '../../shared/auth'
 import { fetchAdminOrder, fetchAdminOrders, patchAdminOrderStatus, type AdminOrder } from '../lib/adminOrders'
-import { exportRowsToExcel, exportRowsToPdf, type ExportColumn } from '../lib/exportTable'
+import { exportRowsToExcel, exportRowsToPdf, type ExportColumn } from '../../shared/exportTable'
 
 type OrderPageMeta = {
   totalElements: number
@@ -108,8 +108,7 @@ export function AdminOrdersPage() {
     setIsLoggingOut(true)
 
     try {
-      await logoutAdmin()
-      clearAuthSession()
+      await logout()
     } finally {
       window.location.assign('/admin/login')
     }

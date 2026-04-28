@@ -13,17 +13,17 @@ import {
   X,
 } from 'lucide-react'
 
-import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card'
-import { Input } from '../components/ui/input'
-import { Skeleton } from '../components/ui/skeleton'
-import AdminSidebar from '../components/admin/AdminSidebar'
+import { Alert, AlertDescription, AlertTitle } from '../../../components/ui/alert'
+import { Badge } from '../../../components/ui/badge'
+import { Button } from '../../../components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../../components/ui/card'
+import { Input } from '../../../components/ui/input'
+import { Skeleton } from '../../../components/ui/skeleton'
+import AdminSidebar from '../components/AdminSidebar'
 import { createAdminCategory, deleteAdminCategory, fetchAdminCategories, updateAdminCategory } from '../lib/adminCategories'
 import type { Category } from '../lib/adminCategories'
-import { clearAuthSession, loadAuthSession, logoutAdmin } from '../lib/auth'
-import { exportRowsToExcel, exportRowsToPdf, type ExportColumn } from '../lib/exportTable'
+import { loadAuthSession, logout } from '../../shared/auth'
+import { exportRowsToExcel, exportRowsToPdf, type ExportColumn } from '../../shared/exportTable'
 
 function slugify(value: string) {
   return value
@@ -98,8 +98,7 @@ export function AdminCategoriesPage() {
     setIsLoggingOut(true)
 
     try {
-      await logoutAdmin()
-      clearAuthSession()
+      await logout()
     } finally {
       window.location.assign('/admin/login')
     }

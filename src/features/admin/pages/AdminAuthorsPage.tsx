@@ -2,16 +2,16 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import { FileSpreadsheet, FileText, Loader2, Menu, PencilLine, RefreshCcw, Search, ShieldCheck, Trash2, X } from 'lucide-react'
 
-import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert'
-import { Badge } from '../components/ui/badge'
-import { Button } from '../components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card'
-import { Input } from '../components/ui/input'
-import { Skeleton } from '../components/ui/skeleton'
-import AdminSidebar from '../components/admin/AdminSidebar'
-import { clearAuthSession, loadAuthSession, logoutAdmin } from '../lib/auth'
+import { Alert, AlertDescription, AlertTitle } from '../../../components/ui/alert'
+import { Badge } from '../../../components/ui/badge'
+import { Button } from '../../../components/ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../../components/ui/card'
+import { Input } from '../../../components/ui/input'
+import { Skeleton } from '../../../components/ui/skeleton'
+import AdminSidebar from '../components/AdminSidebar'
+import { loadAuthSession, logout } from '../../shared/auth'
 import { createAdminAuthor, deleteAdminAuthor, fetchAdminAuthors, updateAdminAuthor, type Author } from '../lib/adminAuthors'
-import { exportRowsToExcel, exportRowsToPdf, type ExportColumn } from '../lib/exportTable'
+import { exportRowsToExcel, exportRowsToPdf, type ExportColumn } from '../../shared/exportTable'
 
 function slugify(value: string) {
   return value
@@ -88,8 +88,7 @@ export function AdminAuthorsPage() {
     setIsLoggingOut(true)
 
     try {
-      await logoutAdmin()
-      clearAuthSession()
+      await logout()
     } finally {
       window.location.assign('/admin/login')
     }

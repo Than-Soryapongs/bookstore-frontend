@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Bot, BookOpen, ChevronRight, ChevronUp, CircleUserRound, CreditCard, LayoutDashboard, LibraryBig, Loader2, LockKeyhole, LogOut, Menu, ShoppingCart, Tags, Users, UserRound, X, type LucideIcon } from 'lucide-react'
 
-import { Button } from '../ui/button'
-import { fetchAdminProfile, type AdminProfile } from '../../lib/adminProfile'
-import { loadAuthSession } from '../../lib/auth'
+import { Button } from '../../../components/ui/button'
+import { fetchAdminProfile, subscribeAdminProfileUpdates, type AdminProfile } from '../lib/adminProfile'
+import { loadAuthSession } from '../../shared/auth'
 
 export type AdminSidebarItem = {
   label: string
@@ -68,6 +68,12 @@ export function AdminSidebar({
   isLoggingOut = false,
 }: AdminSidebarProps) {
   const session = loadAuthSession()
+  const sessionAccessToken = session?.accessToken
+  const sessionAvatarUrl = session?.user.avatarUrl
+  const sessionEmail = session?.user.email
+  const sessionFullName = session?.user.fullName
+  const sessionRole = session?.user.role
+  const sessionUsername = session?.user.username
   const profileMenuRef = useRef<HTMLDivElement | null>(null)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
   const [adminProfile, setAdminProfile] = useState<SidebarAdminProfile | null>(() =>
@@ -92,13 +98,13 @@ export function AdminSidebar({
         }
       })
       .catch(() => {
-        if (isActive && session?.user) {
+        if (isActive && sessionAccessToken) {
           setAdminProfile({
-            avatarUrl: session.user.avatarUrl,
-            email: session.user.email,
-            fullName: session.user.fullName,
-            role: session.user.role,
-            username: session.user.username,
+            avatarUrl: sessionAvatarUrl,
+            email: sessionEmail as string,
+            fullName: sessionFullName as string,
+            role: sessionRole as string,
+            username: sessionUsername as string,
           })
         }
       })
@@ -106,7 +112,31 @@ export function AdminSidebar({
     return () => {
       isActive = false
     }
-  }, [session?.user])
+  }, [sessionAccessToken, sessionAvatarUrl, sessionEmail, sessionFullName, sessionRole, sessionUsername])
+
+  useEffect(() => {
+    return subscribeAdminProfileUpdates((updatedProfile) => {
+      setAdminProfile(
+        updatedProfile
+          ? {
+              avatarUrl: updatedProfile.avatarUrl,
+              email: updatedProfile.email,
+              fullName: updatedProfile.fullName,
+              role: updatedProfile.role,
+              username: updatedProfile.username,
+            }
+          : session?.user
+            ? {
+                avatarUrl: session.user.avatarUrl,
+                email: session.user.email,
+                fullName: session.user.fullName,
+                role: session.user.role,
+                username: session.user.username,
+              }
+            : null,
+      )
+    })
+  }, [session])
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
