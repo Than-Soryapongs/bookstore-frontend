@@ -16,7 +16,7 @@ function toCellValue(value: string | number | boolean | null | undefined) {
 }
 
 function sanitizeSheetName(value: string) {
-  return value.replace(/[\\/?*\[\]:]/g, ' ').slice(0, 31) || 'Sheet1'
+  return value.replace(/[\\/?*[\]:]/g, ' ').slice(0, 31) || 'Sheet1'
 }
 
 export function exportRowsToExcel<T>(rows: T[], columns: ExportColumn<T>[], fileName: string, sheetName: string) {
