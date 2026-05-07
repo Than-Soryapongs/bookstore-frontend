@@ -499,7 +499,6 @@ export function KhqrPaymentModal({
               currency={state.khqr.currency ?? 'USD'}
               qrDataUrl={state.qrDataUrl}
               remainingMs={remainingMs}
-              shortLink={state.khqr.shortLink}
               onCancel={() => void handleCancelOrder()}
             />
           )}

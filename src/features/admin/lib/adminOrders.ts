@@ -4,6 +4,7 @@ export interface AdminOrder {
   id: number
   orderNumber: string
   status: string
+  paymentStatus: string
   paymentMethod: string
   recipientName?: string
   recipientPhone?: string

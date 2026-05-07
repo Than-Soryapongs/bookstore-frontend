@@ -722,6 +722,7 @@ export function AdminOrdersPage() {
                         <th className="px-4 py-3 font-semibold">Order</th>
                         <th className="px-4 py-3 font-semibold">Status</th>
                         <th className="px-4 py-3 font-semibold">Payment</th>
+                        <th className="px-4 py-3 font-semibold">Payment Status</th>
                         <th className="px-4 py-3 font-semibold">Items</th>
                         <th className="px-4 py-3 font-semibold">Total</th>
                         <th className="px-4 py-3 font-semibold">Created at</th>
@@ -735,6 +736,7 @@ export function AdminOrdersPage() {
                           <tr key={index} className="animate-pulse">
                             <td className="px-4 py-4"><div className="h-4 w-28 rounded bg-muted" /></td>
                             <td className="px-4 py-4"><div className="h-5 w-20 rounded-full bg-muted" /></td>
+                            <td className="px-4 py-4"><div className="h-4 w-24 rounded bg-muted" /></td>
                             <td className="px-4 py-4"><div className="h-4 w-24 rounded bg-muted" /></td>
                             <td className="px-4 py-4"><div className="h-4 w-10 rounded bg-muted" /></td>
                             <td className="px-4 py-4"><div className="h-4 w-20 rounded bg-muted" /></td>
@@ -760,6 +762,7 @@ export function AdminOrdersPage() {
                               </Badge>
                             </td>
                             <td className="px-4 py-4">{order.paymentMethod}</td>
+                            <td className="px-4 py-4">{order.paymentStatus}</td>
                             <td className="px-4 py-4 tabular-nums">{order.itemCount}</td>
                             <td className="px-4 py-4 font-semibold tabular-nums">{formatCurrency(order.totalAmount)}</td>
                             <td className="px-4 py-4 text-muted-foreground">{formatDateTime(order.createdAt)}</td>
