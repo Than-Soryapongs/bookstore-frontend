@@ -25,14 +25,6 @@ const sectionLabels: Record<string, { title: string; description: string }> = {
     title: 'Customers',
     description: 'Customer management will be placed here.',
   },
-  'ai-assistance': {
-    title: 'AI Assistance',
-    description: 'Assistant tools and prompts will live here.',
-  },
-  pos: {
-    title: 'POS',
-    description: 'Point-of-sale workflows will be managed here.',
-  },
 }
 
 const sectionHighlights: Record<string, Array<{ label: string; value: string; description: string }>> = {
@@ -50,16 +42,6 @@ const sectionHighlights: Record<string, Array<{ label: string; value: string; de
     { label: 'User focus', value: 'Accounts', description: 'Manage customer records and access.' },
     { label: 'Support', value: 'Activity', description: 'Show recent orders and account state.' },
     { label: 'Retention', value: 'Insights', description: 'Surface engagement and purchase history.' },
-  ],
-  'ai-assistance': [
-    { label: 'Assistant mode', value: 'AI', description: 'Draft prompts, summaries, and admin help flows.' },
-    { label: 'Catalog support', value: 'Search', description: 'Use AI to find and analyze records faster.' },
-    { label: 'Workflow', value: 'Assist', description: 'Guide common admin tasks with smart actions.' },
-  ],
-  pos: [
-    { label: 'Checkout focus', value: 'Terminal', description: 'Handle in-store sales and order capture.' },
-    { label: 'Payments', value: 'Cards', description: 'Support payment capture and receipt flows.' },
-    { label: 'Operations', value: 'Shift', description: 'Keep the checkout screen ready for staff.' },
   ],
   authors: [
     { label: 'Author focus', value: 'Profiles', description: 'Keep author records organized.' },
@@ -83,16 +65,6 @@ const sectionActionCards: Record<string, Array<{ title: string; description: str
     { title: 'Build customer cards', description: 'List account summaries with search and pagination.' },
     { title: 'Surface activity', description: 'Show last login, recent purchases, and status.' },
     { title: 'Keep admin actions safe', description: 'Add dedicated detail and confirmation dialogs.' },
-  ],
-  'ai-assistance': [
-    { title: 'Add assistant chat', description: 'Create a workspace for AI powered admin help.' },
-    { title: 'Show prompt presets', description: 'Quick access to common tasks and commands.' },
-    { title: 'Connect tools later', description: 'Wire model actions when the backend is ready.' },
-  ],
-  pos: [
-    { title: 'Build checkout screen', description: 'Create a fast POS workflow for sales.' },
-    { title: 'Add payment steps', description: 'Capture cash, card, and receipt actions.' },
-    { title: 'Support product lookup', description: 'Search books quickly during checkout.' },
   ],
   authors: [
     { title: 'Use the search flow', description: 'Keep the keyword filter and page controls consistent.' },

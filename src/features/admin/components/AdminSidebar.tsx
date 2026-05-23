@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bot, BookOpen, ChevronRight, ChevronUp, CircleUserRound, CreditCard, LayoutDashboard, LibraryBig, Loader2, LockKeyhole, LogOut, Menu, ShoppingCart, Tags, Users, UserRound, X, type LucideIcon } from 'lucide-react'
+import { BookOpen, ChevronRight, ChevronUp, CircleUserRound, LayoutDashboard, LibraryBig, Loader2, LockKeyhole, LogOut, Menu, ShoppingCart, Tags, Users, UserRound, X, type LucideIcon } from 'lucide-react'
 
 import { Button } from '../../../components/ui/button'
 import { fetchAdminProfile, subscribeAdminProfileUpdates, type AdminProfile } from '../lib/adminProfile'
@@ -47,13 +47,6 @@ const sidebarGroups: AdminSidebarGroup[] = [
     items: [
       { label: 'Orders', icon: ShoppingCart, href: '/admin/dashboard/orders' },
       { label: 'Customers', icon: Users, href: '/admin/dashboard/customers' },
-    ],
-  },
-  {
-    title: 'Tools',
-    items: [
-      { label: 'AI Assistance', icon: Bot, href: '/admin/dashboard/ai-assistance' },
-      { label: 'POS', icon: CreditCard, href: '/admin/dashboard/pos' },
     ],
   },
 ]

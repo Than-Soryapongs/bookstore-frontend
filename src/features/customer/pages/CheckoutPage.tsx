@@ -41,7 +41,7 @@ function getShippingConfig() {
   const defaultFee = parseMoney(import.meta.env.VITE_SHIPPING_DEFAULT_FEE ?? import.meta.env.VITE_APP_SHIPPING_DEFAULT_FEE, 3)
   const freeThreshold = parseMoney(import.meta.env.VITE_SHIPPING_FREE_THRESHOLD ?? import.meta.env.VITE_APP_SHIPPING_FREE_THRESHOLD, 50)
   const rawLocationRates = String(
-    import.meta.env.VITE_SHIPPING_LOCATION_RATES ?? import.meta.env.VITE_APP_SHIPPING_LOCATION_RATES ?? 'phnom penh|2.00;province|3.00'
+    import.meta.env.VITE_SHIPPING_LOCATION_RATES ?? import.meta.env.VITE_APP_SHIPPING_LOCATION_RATES ?? 'phnom penh|0.00;province|3.00'
   )
 
   const locationRates = rawLocationRates
